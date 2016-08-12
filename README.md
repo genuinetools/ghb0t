@@ -2,11 +2,12 @@
 
 [![Travis CI](https://travis-ci.org/jfrazelle/ghb0t.svg?branch=master)](https://travis-ci.org/jfrazelle/ghb0t)
 
-A GitHub Bot to automatically delete your fork's branches after a pull request
+A GitHub Bot to automatically delete your forks branches after a pull request
 has been merged.
 
 > **NOTE:** This will **never** delete a branch named "master" AND will
 **never** delete a branch that is not owned by the current authenticated user.
+If the pull request is closed _without_ merging, it will **not** delete it.
 
 ## Usage
 
