@@ -24,9 +24,8 @@ const (
 )
 
 var (
-	username string
-	token    string
-	seconds  int64
+	token   string
+	seconds int64
 
 	lastChecked time.Time
 
@@ -36,7 +35,6 @@ var (
 
 func init() {
 	// parse flags
-	flag.StringVar(&username, "username", "", "GitHub username")
 	flag.StringVar(&token, "token", "", "GitHub API token")
 	flag.Int64Var(&seconds, "seconds", 30, "seconds to wait before checking for new events")
 
@@ -64,33 +62,38 @@ func init() {
 	if token == "" {
 		usageAndExit("GitHub token cannot be empty.", 1)
 	}
-
-	if username == "" {
-		usageAndExit("GitHub username cannot be empty.", 1)
-	}
 }
 
 func main() {
-	// on ^C, or SIGTERM handle exit
+	// On ^C, or SIGTERM handle exit.
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	signal.Notify(c, syscall.SIGTERM)
 	go func() {
 		for sig := range c {
-			logrus.Infof("Received %s, exiting", sig.String())
+			logrus.Infof("Received %s, exiting.", sig.String())
 			os.Exit(0)
 		}
 	}()
 
-	// create the http client
+	// Create the http client.
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: token},
 	)
 	tc := oauth2.NewClient(oauth2.NoContext, ts)
 
-	// create the github client
+	// Create the github client.
 	client := github.NewClient(tc)
 
+	// Get the authenticated user, the empty string being passed let's the GitHub
+	// API know we want ourself.
+	user, _, err := client.Users.Get("")
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	username := *user.Login
+
+	logrus.Infof("Bot started for user %s.", username)
 	for {
 		page := 1
 		perPage := 20
@@ -98,7 +101,7 @@ func main() {
 			logrus.Fatal(err)
 		}
 
-		// Timeout for the interval
+		// Timeout for the interval.
 		time.Sleep(time.Duration(seconds) * time.Second)
 	}
 }
@@ -124,7 +127,7 @@ func getNotifications(client *github.Client, username string, page, perPage int)
 
 	for _, notification := range notifications {
 		// handle event
-		if err := handleEvent(client, notification); err != nil {
+		if err := handleNotification(client, notification, username); err != nil {
 			return err
 		}
 	}
@@ -138,7 +141,7 @@ func getNotifications(client *github.Client, username string, page, perPage int)
 	return getNotifications(client, username, page, perPage)
 }
 
-func handleEvent(client *github.Client, notification *github.Notification) error {
+func handleNotification(client *github.Client, notification *github.Notification, username string) error {
 	// Check if the type is a pull request.
 	if *notification.Subject.Type == "PullRequest" {
 		// Let's get some information about the pull request.

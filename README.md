@@ -18,8 +18,6 @@ ghb0t - v0.1.0
         seconds to wait before checking for new events (default 30)
   -token string
         GitHub API token
-  -username string
-        GitHub username
   -v    print version and exit (shorthand)
   -version
         print version and exit
