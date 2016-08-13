@@ -133,7 +133,7 @@ func getNotifications(client *github.Client, username string, page, perPage int)
 	}
 
 	// Return early if we are on the last page.
-	if page == resp.LastPage {
+	if page == resp.LastPage || resp.NextPage == 0 {
 		return nil
 	}
 
