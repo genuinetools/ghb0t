@@ -164,7 +164,7 @@ func handleNotification(client *github.Client, notification *github.Notification
 			owner := *pr.Head.Repo.Owner.Login
 			// Never delete the master branch or a branch we do not own.
 			if owner == username && branch != "master" {
-				_, err := client.Git.DeleteRef(username, *pr.Head.Repo.Name, *pr.Head.Ref)
+				_, err := client.Git.DeleteRef(username, *pr.Head.Repo.Name, "heads/"+*pr.Head.Ref)
 				// 422 is the error code for when the branch does not exist.
 				if err != nil && !strings.Contains(err.Error(), " 422 ") {
 					return err
