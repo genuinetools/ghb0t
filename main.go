@@ -116,13 +116,12 @@ func getNotifications(client *github.Client, username string, page, perPage int)
 			PerPage: perPage,
 		},
 	}
+	lastChecked = time.Now()
 
 	notifications, resp, err := client.Activity.ListNotifications(opt)
 	if err != nil {
 		return err
 	}
-
-	lastChecked = time.Now()
 
 	for _, notification := range notifications {
 		// handle event
