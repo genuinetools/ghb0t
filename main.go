@@ -159,6 +159,12 @@ func handleNotification(client *github.Client, notification *github.Notification
 			// If the PR was made from a repository owned by the current user,
 			// let's delete it.
 			branch := *pr.Head.Ref
+			if pr.Head.Repo == nil {
+				return nil
+			}
+			if pr.Head.Repo.Owner == nil {
+				return nil
+			}
 			owner := *pr.Head.Repo.Owner.Login
 			// Never delete the master branch or a branch we do not own.
 			if owner == username && branch != "master" {
