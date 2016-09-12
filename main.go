@@ -116,7 +116,9 @@ func getNotifications(client *github.Client, username string, page, perPage int)
 			PerPage: perPage,
 		},
 	}
-	lastChecked = time.Now()
+	if lastChecked.IsZero() {
+		lastChecked = time.Now()
+	}
 
 	notifications, resp, err := client.Activity.ListNotifications(opt)
 	if err != nil {
