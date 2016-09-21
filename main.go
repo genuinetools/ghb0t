@@ -24,8 +24,8 @@ const (
 )
 
 var (
-	token   string
-	seconds int64
+	token    string
+	interval string
 
 	lastChecked time.Time
 
@@ -36,7 +36,7 @@ var (
 func init() {
 	// parse flags
 	flag.StringVar(&token, "token", "", "GitHub API token")
-	flag.Int64Var(&seconds, "seconds", 30, "seconds to wait before checking for new events")
+	flag.StringVar(&interval, "interval", "30s", "check interval (ex. 5ms, 10s, 1m, 3h)")
 
 	flag.BoolVar(&version, "version", false, "print version and exit")
 	flag.BoolVar(&version, "v", false, "print version and exit (shorthand)")
@@ -65,12 +65,14 @@ func init() {
 }
 
 func main() {
+	var ticker *time.Ticker
 	// On ^C, or SIGTERM handle exit.
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	signal.Notify(c, syscall.SIGTERM)
 	go func() {
 		for sig := range c {
+			ticker.Stop()
 			logrus.Infof("Received %s, exiting.", sig.String())
 			os.Exit(0)
 		}
@@ -93,16 +95,21 @@ func main() {
 	}
 	username := *user.Login
 
+	// parse the duration
+	dur, err := time.ParseDuration(interval)
+	if err != nil {
+		logrus.Fatalf("parsing %s as duration failed: %v", interval, err)
+	}
+	ticker = time.NewTicker(dur)
+
 	logrus.Infof("Bot started for user %s.", username)
-	for {
+
+	for range ticker.C {
 		page := 1
 		perPage := 20
 		if err := getNotifications(client, username, page, perPage); err != nil {
 			logrus.Fatal(err)
 		}
-
-		// Timeout for the interval.
-		time.Sleep(time.Duration(seconds) * time.Second)
 	}
 }
 
