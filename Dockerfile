@@ -9,15 +9,13 @@ RUN	apk add --no-cache \
 
 COPY . /go/src/github.com/jfrazelle/ghb0t
 
-RUN apk add --no-cache --virtual .build-deps \
+RUN set -x \
+	&& apk add --no-cache --virtual .build-deps \
 		go \
 		git \
 		gcc \
 		libc-dev \
 		libgcc \
-	set -x \
-	&& apk update \
-	&& apk add $buildDeps \
 	&& cd /go/src/github.com/jfrazelle/ghb0t \
 	&& go build -o /usr/bin/ghb0t . \
 	&& apk del .build-deps \
