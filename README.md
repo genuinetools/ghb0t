@@ -1,6 +1,6 @@
 # ghb0t
 
-[![Travis CI](https://travis-ci.org/jfrazelle/ghb0t.svg?branch=master)](https://travis-ci.org/jfrazelle/ghb0t)
+[![Travis CI](https://travis-ci.org/jessfraz/ghb0t.svg?branch=master)](https://travis-ci.org/jessfraz/ghb0t)
 
 A GitHub Bot to automatically delete your fork's branches after a pull request
 has been merged.
