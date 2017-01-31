@@ -108,7 +108,7 @@ func main() {
 		page := 1
 		perPage := 20
 		if err := getNotifications(client, username, page, perPage); err != nil {
-			logrus.Fatal(err)
+			logrus.Warn(err)
 		}
 	}
 }
