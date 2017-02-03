@@ -1,0 +1,23 @@
+name: ghb0t
+version: master
+summary: delete your github fork's branches after a pull request has been merged
+description: |
+  GitHub Bot to automatically delete your fork's branches after a pull request
+  has been merged.
+  NOTE: This will never delete a branch named "master" AND will never delete a
+  branch that is not owned by the current authenticated user. If the pull
+  request is closed without merging, it will not delete it.
+
+grade: devel
+confinement: strict
+
+apps:
+  ghb0t:
+    command: ghb0t
+    plugs: [network]
+
+parts:
+  ghb0t:
+    source: .
+    plugin: go
+    go-importpath: github.com/jessfraz/ghb0t
