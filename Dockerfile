@@ -1,4 +1,4 @@
-FROM alpine:latest
+FROM golang:alpine as builder
 MAINTAINER Jessica Frazelle <jess@linux.com>
 
 ENV PATH /go/bin:/usr/local/go/bin:$PATH
@@ -11,16 +11,22 @@ COPY . /go/src/github.com/jessfraz/ghb0t
 
 RUN set -x \
 	&& apk add --no-cache --virtual .build-deps \
-		go \
 		git \
 		gcc \
 		libc-dev \
 		libgcc \
+		make \
 	&& cd /go/src/github.com/jessfraz/ghb0t \
-	&& go build -o /usr/bin/ghb0t . \
+	&& make static \
+	&& mv ghb0t /usr/bin/ghb0t \
 	&& apk del .build-deps \
 	&& rm -rf /go \
 	&& echo "Build complete."
 
+FROM scratch
+
+COPY --from=builder /usr/bin/ghb0t /usr/bin/ghb0t
+COPY --from=builder /etc/ssl/certs/ /etc/ssl/certs
 
 ENTRYPOINT [ "ghb0t" ]
+CMD [ "--help" ]

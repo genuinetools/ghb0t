@@ -14,13 +14,23 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/google/go-github/github"
+	"github.com/jessfraz/ghb0t/version"
 )
 
 const (
 	// BANNER is what is printed for help/info output
-	BANNER = "ghb0t - %s\n"
-	// VERSION is the binary version.
-	VERSION = "v0.1.0"
+	BANNER = `       _     _      ___  _
+  __ _| |__ | |__  / _ \| |_
+ / _` + "`" + ` | '_ \| '_ \| | | | __|
+| (_| | | | | |_) | |_| | |_
+ \__, |_| |_|_.__/ \___/ \__|
+ |___/
+
+ A GitHub Bot to automatically delete your fork's branches after a pull request has been merged.
+ Version: %s
+ Build: %s
+
+`
 )
 
 var (
@@ -29,8 +39,8 @@ var (
 
 	lastChecked time.Time
 
-	debug   bool
-	version bool
+	debug bool
+	vrsn  bool
 )
 
 func init() {
@@ -38,19 +48,19 @@ func init() {
 	flag.StringVar(&token, "token", "", "GitHub API token")
 	flag.StringVar(&interval, "interval", "30s", "check interval (ex. 5ms, 10s, 1m, 3h)")
 
-	flag.BoolVar(&version, "version", false, "print version and exit")
-	flag.BoolVar(&version, "v", false, "print version and exit (shorthand)")
+	flag.BoolVar(&vrsn, "version", false, "print version and exit")
+	flag.BoolVar(&vrsn, "v", false, "print version and exit (shorthand)")
 	flag.BoolVar(&debug, "d", false, "run in debug mode")
 
 	flag.Usage = func() {
-		fmt.Fprint(os.Stderr, fmt.Sprintf(BANNER, VERSION))
+		fmt.Fprint(os.Stderr, fmt.Sprintf(BANNER, version.VERSION, version.GITCOMMIT))
 		flag.PrintDefaults()
 	}
 
 	flag.Parse()
 
-	if version {
-		fmt.Printf("%s", VERSION)
+	if vrsn {
+		fmt.Printf("ghb0t version %s, build %s", version.VERSION, version.GITCOMMIT)
 		os.Exit(0)
 	}
 

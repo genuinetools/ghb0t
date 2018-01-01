@@ -4,8 +4,6 @@
 *.o
 *.a
 *.so
-*.swo
-*.swp
 
 # Folders
 _obj
@@ -45,3 +43,4 @@ Icon
 .Trashes
 
 ghb0t
+cross/
