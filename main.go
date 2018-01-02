@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"os"
@@ -12,9 +13,9 @@ import (
 
 	"golang.org/x/oauth2"
 
-	"github.com/Sirupsen/logrus"
 	"github.com/google/go-github/github"
 	"github.com/jessfraz/ghb0t/version"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -45,7 +46,7 @@ var (
 
 func init() {
 	// parse flags
-	flag.StringVar(&token, "token", "", "GitHub API token")
+	flag.StringVar(&token, "token", os.Getenv("GITHUB_TOKEN"), "GitHub API token (or env var GITHUB_TOKEN)")
 	flag.StringVar(&interval, "interval", "30s", "check interval (ex. 5ms, 10s, 1m, 3h)")
 
 	flag.BoolVar(&vrsn, "version", false, "print version and exit")
@@ -88,18 +89,20 @@ func main() {
 		}
 	}()
 
+	ctx := context.Background()
+
 	// Create the http client.
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: token},
 	)
-	tc := oauth2.NewClient(oauth2.NoContext, ts)
+	tc := oauth2.NewClient(ctx, ts)
 
 	// Create the github client.
 	client := github.NewClient(tc)
 
 	// Get the authenticated user, the empty string being passed let's the GitHub
 	// API know we want ourself.
-	user, _, err := client.Users.Get("")
+	user, _, err := client.Users.Get(ctx, "")
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -117,14 +120,14 @@ func main() {
 	for range ticker.C {
 		page := 1
 		perPage := 20
-		if err := getNotifications(client, username, page, perPage); err != nil {
+		if err := getNotifications(ctx, client, username, page, perPage); err != nil {
 			logrus.Warn(err)
 		}
 	}
 }
 
 // getNotifications iterates over all the notifications received by a user.
-func getNotifications(client *github.Client, username string, page, perPage int) error {
+func getNotifications(ctx context.Context, client *github.Client, username string, page, perPage int) error {
 	opt := &github.NotificationListOptions{
 		All:   true,
 		Since: lastChecked,
@@ -137,14 +140,14 @@ func getNotifications(client *github.Client, username string, page, perPage int)
 		lastChecked = time.Now()
 	}
 
-	notifications, resp, err := client.Activity.ListNotifications(opt)
+	notifications, resp, err := client.Activity.ListNotifications(ctx, opt)
 	if err != nil {
 		return err
 	}
 
 	for _, notification := range notifications {
 		// handle event
-		if err := handleNotification(client, notification, username); err != nil {
+		if err := handleNotification(ctx, client, notification, username); err != nil {
 			return err
 		}
 	}
@@ -155,10 +158,10 @@ func getNotifications(client *github.Client, username string, page, perPage int)
 	}
 
 	page = resp.NextPage
-	return getNotifications(client, username, page, perPage)
+	return getNotifications(ctx, client, username, page, perPage)
 }
 
-func handleNotification(client *github.Client, notification *github.Notification, username string) error {
+func handleNotification(ctx context.Context, client *github.Client, notification *github.Notification, username string) error {
 	// Check if the type is a pull request.
 	if *notification.Subject.Type == "PullRequest" {
 		// Let's get some information about the pull request.
@@ -169,7 +172,7 @@ func handleNotification(client *github.Client, notification *github.Notification
 			return err
 		}
 
-		pr, _, err := client.PullRequests.Get(*notification.Repository.Owner.Login, *notification.Repository.Name, int(id))
+		pr, _, err := client.PullRequests.Get(ctx, *notification.Repository.Owner.Login, *notification.Repository.Name, int(id))
 		if err != nil {
 			return err
 		}
@@ -187,7 +190,7 @@ func handleNotification(client *github.Client, notification *github.Notification
 			owner := *pr.Head.Repo.Owner.Login
 			// Never delete the master branch or a branch we do not own.
 			if owner == username && branch != "master" {
-				_, err := client.Git.DeleteRef(username, *pr.Head.Repo.Name, strings.Replace("heads/"+*pr.Head.Ref, "#", "%23", -1))
+				_, err := client.Git.DeleteRef(ctx, username, *pr.Head.Repo.Name, strings.Replace("heads/"+*pr.Head.Ref, "#", "%23", -1))
 				// 422 is the error code for when the branch does not exist.
 				if err != nil && !strings.Contains(err.Error(), " 422 ") {
 					return err

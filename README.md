@@ -44,7 +44,7 @@ $ ghb0t -h
   -interval string
         check interval (ex. 5ms, 10s, 1m, 3h) (default "30s")
   -token string
-        GitHub API token
+        GitHub API token (or env var GITHUB_TOKEN)
   -v    print version and exit (shorthand)
   -version
         print version and exit
