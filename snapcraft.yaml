@@ -20,4 +20,4 @@ parts:
   ghb0t:
     source: .
     plugin: go
-    go-importpath: github.com/jessfraz/ghb0t
+    go-importpath: github.com/chris-short/ghb0t
