@@ -172,7 +172,7 @@ func handleNotification(ctx context.Context, client *github.Client, notification
 			return err
 		}
 
-		pr, _, err := client.PullRequests.Get(ctx, *notification.Repository.Owner.Login, *notification.Repository.Name, int(id))
+		pr, _, err := client.PullRequests.Get(ctx, *notification.Repository.Owner.Login, *notification.Repository.Name, id)
 		if err != nil {
 			return err
 		}
