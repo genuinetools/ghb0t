@@ -7,7 +7,7 @@ ENV GOPATH /go
 RUN	apk add --no-cache \
 	ca-certificates
 
-COPY . /go/src/github.com/jessfraz/ghb0t
+COPY . /go/src/github.com/genuinetools/ghb0t
 
 RUN set -x \
 	&& apk add --no-cache --virtual .build-deps \
@@ -16,7 +16,7 @@ RUN set -x \
 		libc-dev \
 		libgcc \
 		make \
-	&& cd /go/src/github.com/jessfraz/ghb0t \
+	&& cd /go/src/github.com/genuinetools/ghb0t \
 	&& make static \
 	&& mv ghb0t /usr/bin/ghb0t \
 	&& apk del .build-deps \
