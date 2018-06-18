@@ -37,7 +37,7 @@ const (
 var (
 	token    string
 	interval string
-	host     string
+	enturl   string
 
 	lastChecked time.Time
 
@@ -49,7 +49,7 @@ func init() {
 	// parse flags
 	flag.StringVar(&token, "token", os.Getenv("GITHUB_TOKEN"), "GitHub API token (or env var GITHUB_TOKEN)")
 	flag.StringVar(&interval, "interval", "30s", "check interval (ex. 5ms, 10s, 1m, 3h)")
-	flag.StringVar(&host, "host", "", "Connect to a specific GitHub server, provide full API URL (ex. https://github.example.com/api/v3/.")
+	flag.StringVar(&enturl, "url", "", "Connect to a specific GitHub server, provide full API URL (ex. https://github.example.com/api/v3/.")
 
 	flag.BoolVar(&vrsn, "version", false, "print version and exit")
 	flag.BoolVar(&vrsn, "v", false, "print version and exit (shorthand)")
@@ -101,12 +101,12 @@ func main() {
 
 	// Create the github client.
 	client := github.NewClient(tc)
-	if host != "" {
-		u, err := url.Parse(host)
+	if enturl != "" {
+		var err error
+		client.BaseURL, err = url.Parse(enturl)
 		if err != nil {
-			logrus.Fatalf("failed to parse provided host URL: %v", err)
+			logrus.Fatalf("failed to parse provided url: %v", err)
 		}
-		client.BaseURL = u
 	}
 
 	// Get the authenticated user, the empty string being passed let's the GitHub
