@@ -46,7 +46,7 @@ $ ghb0t -h
   -token string
         GitHub API token (or env var GITHUB_TOKEN)
   -url string
-        Connect to a specific GitHub server, provide full API URL (ex. https://github.example.com/api/v3/.
+        Connect to a specific GitHub server, provide full API URL (ex. https://github.example.com/api/v3/)
   -v    print version and exit (shorthand)
   -version
         print version and exit
