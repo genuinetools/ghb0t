@@ -38,13 +38,15 @@ $ ghb0t -h
 
  A GitHub Bot to automatically delete your fork's branches after a pull request has been merged.
  Version: v0.4.0
- Build: be7363d
+ Build: a2c01d3
 
   -d    run in debug mode
   -interval string
         check interval (ex. 5ms, 10s, 1m, 3h) (default "30s")
   -token string
         GitHub API token (or env var GITHUB_TOKEN)
+  -url string
+        Connect to a specific GitHub server, provide full API URL (ex. https://github.example.com/api/v3/.
   -v    print version and exit (shorthand)
   -version
         print version and exit
