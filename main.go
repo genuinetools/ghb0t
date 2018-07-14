@@ -36,7 +36,7 @@ const (
 
 var (
 	token    string
-	interval string
+	interval time.Duration
 	enturl   string
 
 	lastChecked time.Time
@@ -48,7 +48,7 @@ var (
 func init() {
 	// parse flags
 	flag.StringVar(&token, "token", os.Getenv("GITHUB_TOKEN"), "GitHub API token (or env var GITHUB_TOKEN)")
-	flag.StringVar(&interval, "interval", "30s", "check interval (ex. 5ms, 10s, 1m, 3h)")
+	flag.DurationVar(&interval, "interval", 30*time.Second, "check interval (ex. 5ms, 10s, 1m, 3h)")
 	flag.StringVar(&enturl, "url", "", "Connect to a specific GitHub server, provide full API URL (ex. https://github.example.com/api/v3/)")
 
 	flag.BoolVar(&vrsn, "version", false, "print version and exit")
@@ -78,7 +78,8 @@ func init() {
 }
 
 func main() {
-	var ticker *time.Ticker
+	ticker := time.NewTicker(interval)
+
 	// On ^C, or SIGTERM handle exit.
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
@@ -116,13 +117,6 @@ func main() {
 		logrus.Fatal(err)
 	}
 	username := *user.Login
-
-	// parse the duration
-	dur, err := time.ParseDuration(interval)
-	if err != nil {
-		logrus.Fatalf("parsing %s as duration failed: %v", interval, err)
-	}
-	ticker = time.NewTicker(dur)
 
 	logrus.Infof("Bot started for user %s.", username)
 
