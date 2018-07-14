@@ -13,11 +13,11 @@ If the pull request is closed _without_ merging, it will **not** delete it.
 
 #### Binaries
 
-- **darwin** [386](https://github.com/genuinetools/ghb0t/releases/download/v0.4.3/ghb0t-darwin-386) / [amd64](https://github.com/genuinetools/ghb0t/releases/download/v0.4.3/ghb0t-darwin-amd64)
-- **freebsd** [386](https://github.com/genuinetools/ghb0t/releases/download/v0.4.3/ghb0t-freebsd-386) / [amd64](https://github.com/genuinetools/ghb0t/releases/download/v0.4.3/ghb0t-freebsd-amd64)
-- **linux** [386](https://github.com/genuinetools/ghb0t/releases/download/v0.4.3/ghb0t-linux-386) / [amd64](https://github.com/genuinetools/ghb0t/releases/download/v0.4.3/ghb0t-linux-amd64) / [arm](https://github.com/genuinetools/ghb0t/releases/download/v0.4.3/ghb0t-linux-arm) / [arm64](https://github.com/genuinetools/ghb0t/releases/download/v0.4.3/ghb0t-linux-arm64)
-- **solaris** [amd64](https://github.com/genuinetools/ghb0t/releases/download/v0.4.3/ghb0t-solaris-amd64)
-- **windows** [386](https://github.com/genuinetools/ghb0t/releases/download/v0.4.3/ghb0t-windows-386) / [amd64](https://github.com/genuinetools/ghb0t/releases/download/v0.4.3/ghb0t-windows-amd64)
+- **darwin** [386](https://github.com/genuinetools/ghb0t/releases/download/v0.4.4/ghb0t-darwin-386) / [amd64](https://github.com/genuinetools/ghb0t/releases/download/v0.4.4/ghb0t-darwin-amd64)
+- **freebsd** [386](https://github.com/genuinetools/ghb0t/releases/download/v0.4.4/ghb0t-freebsd-386) / [amd64](https://github.com/genuinetools/ghb0t/releases/download/v0.4.4/ghb0t-freebsd-amd64)
+- **linux** [386](https://github.com/genuinetools/ghb0t/releases/download/v0.4.4/ghb0t-linux-386) / [amd64](https://github.com/genuinetools/ghb0t/releases/download/v0.4.4/ghb0t-linux-amd64) / [arm](https://github.com/genuinetools/ghb0t/releases/download/v0.4.4/ghb0t-linux-arm) / [arm64](https://github.com/genuinetools/ghb0t/releases/download/v0.4.4/ghb0t-linux-arm64)
+- **solaris** [amd64](https://github.com/genuinetools/ghb0t/releases/download/v0.4.4/ghb0t-solaris-amd64)
+- **windows** [386](https://github.com/genuinetools/ghb0t/releases/download/v0.4.4/ghb0t-windows-386) / [amd64](https://github.com/genuinetools/ghb0t/releases/download/v0.4.4/ghb0t-windows-amd64)
 
 #### Via Go
 
@@ -37,7 +37,7 @@ $ ghb0t -h
  |___/
 
  A GitHub Bot to automatically delete your fork's branches after a pull request has been merged.
- Version: v0.4.3
+ Version: v0.4.4
  Build: df0e675
 
   -d    run in debug mode
