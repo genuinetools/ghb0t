@@ -30,27 +30,20 @@ $ go get github.com/genuinetools/ghb0t
 
 ## Usage
 
-```
+```console
 $ ghb0t -h
-       _     _      ___  _
-  __ _| |__ | |__  / _ \| |_
- / _` | '_ \| '_ \| | | | __|
-| (_| | | | | |_) | |_| | |_
- \__, |_| |_|_.__/ \___/ \__|
- |___/
+ghb0t -  A GitHub Bot to automatically delete your fork's branches after a pull request has been merged.
 
- A GitHub Bot to automatically delete your fork's branches after a pull request has been merged.
- Version: v0.4.4
- Build: df0e675
+Usage: ghb0t <command>
 
-  -d    run in debug mode
-  -interval duration
-        check interval (ex. 5ms, 10s, 1m, 3h) (default 30s)
-  -token string
-        GitHub API token (or env var GITHUB_TOKEN)
-  -url string
-        Connect to a specific GitHub server, provide full API URL (ex. https://github.example.com/api/v3/)
-  -v    print version and exit (shorthand)
-  -version
-        print version and exit
+Flags:
+
+  -d         enable debug logging (default: false)
+  -interval  check interval (ex. 5ms, 10s, 1m, 3h) (default: 30s)
+  -token     GitHub API token (or env var GITHUB_TOKEN) (default: 97759a862f8f64ced87c60da37ee1fd64df8a89c)
+  -url       Connect to a specific GitHub server, provide full API URL (ex. https://github.example.com/api/v3/) (default: <none>)
+
+Commands:
+
+  version  Show the version information.
 ```

@@ -13,25 +13,10 @@ import (
 	"time"
 
 	"github.com/genuinetools/ghb0t/version"
+	"github.com/genuinetools/pkg/cli"
 	"github.com/google/go-github/github"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
-)
-
-const (
-	// BANNER is what is printed for help/info output
-	BANNER = `       _     _      ___  _
-  __ _| |__ | |__  / _ \| |_
- / _` + "`" + ` | '_ \| '_ \| | | | __|
-| (_| | | | | |_) | |_| | |_
- \__, |_| |_|_.__/ \___/ \__|
- |___/
-
- A GitHub Bot to automatically delete your fork's branches after a pull request has been merged.
- Version: %s
- Build: %s
-
-`
 )
 
 var (
@@ -42,91 +27,97 @@ var (
 	lastChecked time.Time
 
 	debug bool
-	vrsn  bool
 )
 
-func init() {
-	// parse flags
-	flag.StringVar(&token, "token", os.Getenv("GITHUB_TOKEN"), "GitHub API token (or env var GITHUB_TOKEN)")
-	flag.DurationVar(&interval, "interval", 30*time.Second, "check interval (ex. 5ms, 10s, 1m, 3h)")
-	flag.StringVar(&enturl, "url", "", "Connect to a specific GitHub server, provide full API URL (ex. https://github.example.com/api/v3/)")
-
-	flag.BoolVar(&vrsn, "version", false, "print version and exit")
-	flag.BoolVar(&vrsn, "v", false, "print version and exit (shorthand)")
-	flag.BoolVar(&debug, "d", false, "run in debug mode")
-
-	flag.Usage = func() {
-		fmt.Fprint(os.Stderr, fmt.Sprintf(BANNER, version.VERSION, version.GITCOMMIT))
-		flag.PrintDefaults()
-	}
-
-	flag.Parse()
-
-	if vrsn {
-		fmt.Printf("ghb0t version %s, build %s", version.VERSION, version.GITCOMMIT)
-		os.Exit(0)
-	}
-
-	// set log level
-	if debug {
-		logrus.SetLevel(logrus.DebugLevel)
-	}
-
-	if token == "" {
-		usageAndExit("GitHub token cannot be empty.", 1)
-	}
-}
-
 func main() {
-	ticker := time.NewTicker(interval)
+	// Create a new cli program.
+	p := cli.NewProgram()
+	p.Name = "ghb0t"
+	p.Description = "A GitHub Bot to automatically delete your fork's branches after a pull request has been merged"
 
-	// On ^C, or SIGTERM handle exit.
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
-	signal.Notify(c, syscall.SIGTERM)
-	go func() {
-		for sig := range c {
-			ticker.Stop()
-			logrus.Infof("Received %s, exiting.", sig.String())
-			os.Exit(0)
+	// Set the GitCommit and Version.
+	p.GitCommit = version.GITCOMMIT
+	p.Version = version.VERSION
+
+	// Setup the global flags.
+	p.FlagSet = flag.NewFlagSet("global", flag.ExitOnError)
+	p.FlagSet.StringVar(&token, "token", os.Getenv("GITHUB_TOKEN"), "GitHub API token (or env var GITHUB_TOKEN)")
+	p.FlagSet.DurationVar(&interval, "interval", 30*time.Second, "check interval (ex. 5ms, 10s, 1m, 3h)")
+	p.FlagSet.StringVar(&enturl, "url", "", "Connect to a specific GitHub server, provide full API URL (ex. https://github.example.com/api/v3/)")
+
+	p.FlagSet.BoolVar(&debug, "d", false, "enable debug logging")
+
+	// Set the before function.
+	p.Before = func(ctx context.Context) error {
+		// Set the log level.
+		if debug {
+			logrus.SetLevel(logrus.DebugLevel)
 		}
-	}()
 
-	ctx := context.Background()
+		if token == "" {
+			return fmt.Errorf("GitHub token cannot be empty")
+		}
 
-	// Create the http client.
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: token},
-	)
-	tc := oauth2.NewClient(ctx, ts)
+		return nil
+	}
 
-	// Create the github client.
-	client := github.NewClient(tc)
-	if enturl != "" {
-		var err error
-		client.BaseURL, err = url.Parse(enturl)
+	// Set the main program action.
+	p.Action = func(ctx context.Context, args []string) error {
+		ticker := time.NewTicker(interval)
+
+		// On ^C, or SIGTERM handle exit.
+		c := make(chan os.Signal, 1)
+		signal.Notify(c, os.Interrupt)
+		signal.Notify(c, syscall.SIGTERM)
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithCancel(ctx)
+		go func() {
+			for sig := range c {
+				cancel()
+				ticker.Stop()
+				logrus.Infof("Received %s, exiting.", sig.String())
+				os.Exit(0)
+			}
+		}()
+
+		// Create the http client.
+		ts := oauth2.StaticTokenSource(
+			&oauth2.Token{AccessToken: token},
+		)
+		tc := oauth2.NewClient(ctx, ts)
+
+		// Create the github client.
+		client := github.NewClient(tc)
+		if enturl != "" {
+			var err error
+			client.BaseURL, err = url.Parse(enturl)
+			if err != nil {
+				logrus.Fatalf("failed to parse provided url: %v", err)
+			}
+		}
+
+		// Get the authenticated user, the empty string being passed let's the GitHub
+		// API know we want ourself.
+		user, _, err := client.Users.Get(ctx, "")
 		if err != nil {
-			logrus.Fatalf("failed to parse provided url: %v", err)
+			logrus.Fatal(err)
 		}
-	}
+		username := *user.Login
 
-	// Get the authenticated user, the empty string being passed let's the GitHub
-	// API know we want ourself.
-	user, _, err := client.Users.Get(ctx, "")
-	if err != nil {
-		logrus.Fatal(err)
-	}
-	username := *user.Login
+		logrus.Infof("Bot started for user %s.", username)
 
-	logrus.Infof("Bot started for user %s.", username)
-
-	for range ticker.C {
-		page := 1
-		perPage := 20
-		if err := getNotifications(ctx, client, username, page, perPage); err != nil {
-			logrus.Warn(err)
+		for range ticker.C {
+			page := 1
+			perPage := 20
+			if err := getNotifications(ctx, client, username, page, perPage); err != nil {
+				logrus.Warn(err)
+			}
 		}
+		return nil
 	}
+
+	// Run our program.
+	p.Run()
 }
 
 // getNotifications iterates over all the notifications received by a user.
@@ -204,14 +195,4 @@ func handleNotification(ctx context.Context, client *github.Client, notification
 	}
 
 	return nil
-}
-
-func usageAndExit(message string, exitCode int) {
-	if message != "" {
-		fmt.Fprintf(os.Stderr, message)
-		fmt.Fprintf(os.Stderr, "\n\n")
-	}
-	flag.Usage()
-	fmt.Fprintf(os.Stderr, "\n")
-	os.Exit(exitCode)
 }
