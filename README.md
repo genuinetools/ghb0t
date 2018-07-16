@@ -40,7 +40,7 @@ Flags:
 
   -d         enable debug logging (default: false)
   -interval  check interval (ex. 5ms, 10s, 1m, 3h) (default: 30s)
-  -token     GitHub API token (or env var GITHUB_TOKEN) (default: 97759a862f8f64ced87c60da37ee1fd64df8a89c)
+  -token     GitHub API token (or env var GITHUB_TOKEN) 
   -url       Connect to a specific GitHub server, provide full API URL (ex. https://github.example.com/api/v3/) (default: <none>)
 
 Commands:
