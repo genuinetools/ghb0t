@@ -4,7 +4,7 @@ summary: delete your github fork's branches after a pull request has been merged
 description: |
   GitHub Bot to automatically delete your fork's branches after a pull request
   has been merged.
-  NOTE: This will never delete a branch named "master" AND will never delete a
+  NOTE: This will never delete the default branch AND will never delete a
   branch that is not owned by the current authenticated user. If the pull
   request is closed without merging, it will not delete it.
 
