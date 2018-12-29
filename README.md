@@ -11,10 +11,9 @@ has been merged.
 **never** delete a branch that is not owned by the current authenticated user.
 If the pull request is closed _without_ merging, it will **not** delete it.
 
- * [Installation](README.md#installation)
-      * [Binaries](README.md#binaries)
-      * [Via Go](README.md#via-go)
- * [Usage](README.md#usage)
+<!-- toc -->
+
+<!-- tocstop -->
 
 ## Installation
 
