@@ -13,6 +13,11 @@ If the pull request is closed _without_ merging, it will **not** delete it.
 
 <!-- toc -->
 
+- [Installation](#installation)
+    + [Binaries](#binaries)
+    + [Via Go](#via-go)
+- [Usage](#usage)
+
 <!-- tocstop -->
 
 ## Installation
