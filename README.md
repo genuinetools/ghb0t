@@ -1,6 +1,7 @@
 # ghb0t
 
-[![Travis CI](https://img.shields.io/travis/genuinetools/ghb0t.svg?style=for-the-badge)](https://travis-ci.org/genuinetools/ghb0t)
+![make-all](https://github.com/genuinetools/ghb0t/workflows/make%20all/badge.svg)
+![make-image](https://github.com/genuinetools/ghb0t/workflows/make%20image/badge.svg)
 [![GoDoc](https://img.shields.io/badge/godoc-reference-5272B4.svg?style=for-the-badge)](https://godoc.org/github.com/genuinetools/ghb0t)
 [![Github All Releases](https://img.shields.io/github/downloads/genuinetools/ghb0t/total.svg?style=for-the-badge)](https://github.com/genuinetools/ghb0t/releases)
 
@@ -11,14 +12,8 @@ has been merged.
 **never** delete a branch that is not owned by the current authenticated user.
 If the pull request is closed _without_ merging, it will **not** delete it.
 
-<!-- toc -->
-
-- [Installation](#installation)
-    + [Binaries](#binaries)
-    + [Via Go](#via-go)
-- [Usage](#usage)
-
-<!-- tocstop -->
+<!-- START doctoc -->
+<!-- END doctoc -->
 
 ## Installation
 
