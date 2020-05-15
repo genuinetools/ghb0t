@@ -3,9 +3,12 @@ module github.com/genuinetools/ghb0t
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/genuinetools/pkg v0.0.0-20180910213200-1c141f661797
+	github.com/google/btree v1.0.0 // indirect
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/go-querystring v1.0.0 // indirect
+	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79
 	github.com/onsi/gomega v1.4.2 // indirect
+	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.0.6
 	github.com/stretchr/testify v1.2.2 // indirect

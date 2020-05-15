@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"net/http"
 	"net/url"
 	"os"
 	"os/signal"
@@ -15,6 +16,8 @@ import (
 	"github.com/genuinetools/ghb0t/version"
 	"github.com/genuinetools/pkg/cli"
 	"github.com/google/go-github/github"
+	"github.com/gregjones/httpcache"
+	"github.com/gregjones/httpcache/diskcache"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
 )
@@ -66,13 +69,13 @@ func main() {
 		ticker := time.NewTicker(interval)
 
 		// On ^C, or SIGTERM handle exit.
-		c := make(chan os.Signal, 1)
-		signal.Notify(c, os.Interrupt)
-		signal.Notify(c, syscall.SIGTERM)
+		signals := make(chan os.Signal, 1)
+		signal.Notify(signals, os.Interrupt)
+		signal.Notify(signals, syscall.SIGTERM)
 		var cancel context.CancelFunc
 		ctx, cancel = context.WithCancel(ctx)
 		go func() {
-			for sig := range c {
+			for sig := range signals {
 				cancel()
 				ticker.Stop()
 				logrus.Infof("Received %s, exiting.", sig.String())
@@ -84,15 +87,24 @@ func main() {
 		ts := oauth2.StaticTokenSource(
 			&oauth2.Token{AccessToken: token},
 		)
-		tc := oauth2.NewClient(ctx, ts)
 
+		// Create the HTTP cache.
+		cachePath := "/tmp/cache"
+		if err := os.MkdirAll(cachePath, 0777); err != nil {
+			logrus.Fatal(err)
+		}
+		cache := diskcache.New(cachePath)
+		tr := httpcache.NewTransport(cache)
+		c := &http.Client{Transport: tr}
+		ctx = context.WithValue(ctx, oauth2.HTTPClient, c)
 		// Create the github client.
+		tc := oauth2.NewClient(ctx, ts)
 		client := github.NewClient(tc)
 		if enturl != "" {
 			var err error
-			client.BaseURL, err = url.Parse(enturl)
+			client.BaseURL, err = url.Parse(enturl + "/api/v3/")
 			if err != nil {
-				logrus.Fatalf("failed to parse provided url: %v", err)
+				logrus.Fatal(err)
 			}
 		}
 
