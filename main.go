@@ -97,6 +97,7 @@ func main() {
 		tr := httpcache.NewTransport(cache)
 		c := &http.Client{Transport: tr}
 		ctx = context.WithValue(ctx, oauth2.HTTPClient, c)
+
 		// Create the github client.
 		tc := oauth2.NewClient(ctx, ts)
 		client := github.NewClient(tc)
